@@ -1,6 +1,5 @@
 //
 //  File.swift
-//  
 //
 //  Created by Christian Risi on 25/08/22.
 //
@@ -11,6 +10,16 @@ import Foundation
 @available(tvOS 13.0, *)
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
+
+/**
+ It is a `DoublyLinkedList` with a better access to any of its elements.
+ It provides an access with an ammortized cost of O(log n) to any elements with the drawback of taking more space in the process O(n log n).
+ It allows you to have an array like structure that doesn't need any resize operation if you add more elements than its capacity, while keeping a relatively fast access to its elements
+ 
+ - Warning
+ For now it is possible to get access to any element in reading and writing, but there's still no way of adding elements in between of existing elements.
+ Also the searching algorytim it' squite limited though faster than a DoublyLinkedList
+ */
 public class PerformanceList<Element> {
     
     private var scrollList: DoublyLinkedList<DoublyLinkedList<Element>>
