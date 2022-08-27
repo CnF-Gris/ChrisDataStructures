@@ -12,7 +12,7 @@ import Foundation
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
 
-extension SupportList : RandomAccessCollection, ObservableObject {
+extension PerformanceList : RandomAccessCollection, ObservableObject {
     public var startIndex: Int {
         0
     }
@@ -25,11 +25,11 @@ extension SupportList : RandomAccessCollection, ObservableObject {
     public typealias Element = Element
     public typealias Index = Int
     public typealias Indices = Range<Int>
-    public typealias SubSequence = SupportList<Element>
+    public typealias SubSequence = PerformanceList<Element>
     
-    public subscript(bounds: Range<Int>) -> SupportList<Element> {
+    public subscript(bounds: Range<Int>) -> PerformanceList<Element> {
         get{
-        let tmp = SupportList<Element>()
+        let tmp = PerformanceList<Element>()
         
         for index in bounds {
             tmp.addLast(element: self[index])
