@@ -4,12 +4,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "Chris_DataStructures",
+    name: "ChrisDataStructures",
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
-            name: "Chris_DataStructures",
-            targets: ["Chris_DataStructures"]),
+            name: "ChrisDataStructures",
+            targets: ["ChrisDataStructures"]),
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
@@ -19,10 +19,11 @@ let package = Package(
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(
-            name: "Chris_DataStructures",
-            dependencies: []),
+            name: "ChrisDataStructures",
+            dependencies: [],
+        path: "Sources/ChrisDataStructures"),
         .testTarget(
-            name: "Chris_DataStructuresTests",
-            dependencies: ["Chris_DataStructures"]),
+            name: "ChrisDataStructuresTests",
+            dependencies: ["ChrisDataStructures"]),
     ]
 )
