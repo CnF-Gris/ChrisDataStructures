@@ -13,7 +13,7 @@ import Foundation
 @available(macOS 10.15, *)
 public class SupportList<Element> {
     
-    @Published private var scrollList: DoublyLinkedList<DoublyLinkedList<Element>>
+    private var scrollList: DoublyLinkedList<DoublyLinkedList<Element>>
     private let levelZeroDivider: Int
     
     private var startOffset: Int
@@ -25,6 +25,8 @@ public class SupportList<Element> {
     private var lastItemTaken : (node: DoublyLinkedNode<Element>,index: Int)?
     private var dirty : Bool = true
     private var searchOffset: Int = 0
+    
+    @Published private var changedTrigger : Bool = true
     
     public convenience init() {
         self.init(divider: 100)
@@ -49,7 +51,7 @@ public class SupportList<Element> {
         if ((startOffset % (levelZeroDivider)) == 0) && scrollList.count > 1 {
             addUpperCascaded()
         }
-        
+        changedTrigger = !changedTrigger
         dirty = true
         
     }
@@ -66,6 +68,7 @@ public class SupportList<Element> {
         }
         
         dirty = true
+        changedTrigger = !changedTrigger
         
     }
     
@@ -99,6 +102,17 @@ public class SupportList<Element> {
     //TODO: If needed add a way to count from the end
     public subscript(position: Int) -> Element {
         
+        get{
+            return efficientSearch(position: position).element
+        }
+        
+        set(newValue){
+            efficientSearch(position: position).element = newValue
+        }
+        
+    }
+    
+    private func efficientSearch(position: Int) -> DoublyLinkedNode<Element> {
         //Starting from the most external Layer
         if lastItemTaken != nil {
             if abs(distance(from: lastItemTaken!.index, to: position)) == 1 {
@@ -111,12 +125,12 @@ public class SupportList<Element> {
                     let tmp = lastItemTaken!.node.next!
                     let tmpIndex = lastItemTaken!.index
                     lastItemTaken = (node: tmp, index: tmpIndex + 1)
-                    return tmp.element
+                    return tmp
                 } else {
                     let tmp = lastItemTaken!.node.previous!
                     let tmpIndex = lastItemTaken!.index
                     lastItemTaken = (node: tmp, index: tmpIndex - 1)
-                    return tmp.element
+                    return tmp
                 }
                 
             }
@@ -124,7 +138,7 @@ public class SupportList<Element> {
         
         let tmp = searchWithIndex(position: position)
         lastItemTaken = (node: tmp, index: position)
-        return tmp.element
+        return tmp
     }
     
     private func searchWithIndex(position: Int) -> DoublyLinkedNode<Element> {

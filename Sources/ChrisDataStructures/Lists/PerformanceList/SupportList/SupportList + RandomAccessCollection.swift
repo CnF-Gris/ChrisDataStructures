@@ -28,12 +28,15 @@ extension SupportList : RandomAccessCollection, ObservableObject {
     public typealias SubSequence = SupportList<Element>
     
     public subscript(bounds: Range<Int>) -> SupportList<Element> {
+        get{
         let tmp = SupportList<Element>()
         
         for index in bounds {
             tmp.addLast(element: self[index])
         }
         return tmp
+        }
+        
     }
     
 }
