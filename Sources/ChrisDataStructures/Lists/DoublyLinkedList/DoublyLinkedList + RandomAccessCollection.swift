@@ -7,7 +7,6 @@
 
 import Foundation
 
-//TODO: Conform DoublyLinkedList to the Protocol RandomAccessCollection
 extension DoublyLinkedList : RandomAccessCollection {
     
     public typealias Element = Element

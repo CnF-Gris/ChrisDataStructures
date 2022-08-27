@@ -12,7 +12,6 @@ public class DoublyLinkedList<Element> {
     private let header : DoublyLinkedNode<Element>
     private let trailer : DoublyLinkedNode<Element>
     
-    //FIXME: There's a problem with counts
     public var count : Int
     public var isEmpty : Bool { return count == 0 }
     

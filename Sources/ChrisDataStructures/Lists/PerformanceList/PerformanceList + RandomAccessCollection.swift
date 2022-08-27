@@ -29,12 +29,12 @@ extension PerformanceList : RandomAccessCollection, ObservableObject {
     
     public subscript(bounds: Range<Int>) -> PerformanceList<Element> {
         get{
-        let tmp = PerformanceList<Element>()
-        
-        for index in bounds {
-            tmp.addLast(element: self[index])
-        }
-        return tmp
+            let tmp = PerformanceList<Element>()
+            
+            for index in bounds {
+                tmp.addLast(element: self[index])
+            }
+            return tmp
         }
         
     }

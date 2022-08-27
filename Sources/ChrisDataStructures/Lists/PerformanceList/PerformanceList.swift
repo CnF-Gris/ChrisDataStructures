@@ -6,20 +6,21 @@
 
 import Foundation
 
+/**
+ A `DoublyLinkedList` with a better RandomAccess to any elements
+ 
+ This List allows you to have both benefits of Arrays and Lists while reducing their drawbacks
+ 
+ - Complexity: Space: O(n log n)
+ - Complexity: Access: O(log n), Adding or Removing on Both ends: O(1)
+ - Warning: Removal of Elements has not been tested
+ 
+
+ */
 @available(watchOS 6.0, *)
 @available(tvOS 13.0, *)
 @available(iOS 13.0, *)
 @available(macOS 10.15, *)
-
-/**
- It is a `DoublyLinkedList` with a better access to any of its elements.
- It provides an access with an ammortized cost of O(log n) to any elements with the drawback of taking more space in the process O(n log n).
- It allows you to have an array like structure that doesn't need any resize operation if you add more elements than its capacity, while keeping a relatively fast access to its elements
- 
- - Warning
- For now it is possible to get access to any element in reading and writing, but there's still no way of adding elements in between of existing elements.
- Also the searching algorytim it' squite limited though faster than a DoublyLinkedList
- */
 public class PerformanceList<Element> {
     
     private var scrollList: DoublyLinkedList<DoublyLinkedList<Element>>
@@ -28,13 +29,16 @@ public class PerformanceList<Element> {
     private var startOffset: Int
     private var endOffset: Int
     
+    ///The number of elements in the Collection
     public var count : Int {scrollList.getFirst()!.count}
+    ///Tells if the list is empty or not. Gives a Boolean value to avoid boilerplate code
     public var isEmpty : Bool {return count == 0}
     
     private var lastItemTaken : (node: DoublyLinkedNode<Element>,index: Int)?
     private var dirty : Bool = true
     private var searchOffset: Int = 0
     
+    ///It's just to keep it updated
     @Published private var changedTrigger : Bool = true
     
     public convenience init() {
@@ -52,6 +56,14 @@ public class PerformanceList<Element> {
     //Public functions
     //----------------------------------------------------------------------------
     
+    /**
+     Adds an element at the beginning of the Collection
+     
+     - Complexity: O(1)
+     
+     - Parameters:
+     - Parameter element: The element to add at the beginning of the collection
+     */
     public func addFirst(element: Element) {
         
         addStartOffset()
@@ -65,6 +77,14 @@ public class PerformanceList<Element> {
         
     }
     
+    /**
+     Adds an element at the end of the Collection
+     
+     - Complexity: O(1)
+     
+     - Parameters:
+     - Parameter element: The element to add at the end of the collection
+     */
     public func addLast(element: Element) {
         
         addEndOffset()
@@ -81,6 +101,15 @@ public class PerformanceList<Element> {
         
     }
     
+    /**
+     Removes and Returns the element at the beginning of the Collection
+     
+     - Complexity: O(1)
+     
+     - Warning: It has not been tested
+     
+     - Returns: The first element of the collection or `nil` if empty
+     */
     public func removeFirst() -> Element? {
         let tmp = scrollList.getFirst()!.removeFirst()
         removeUpperCascaded()
@@ -88,6 +117,15 @@ public class PerformanceList<Element> {
         return tmp
     }
     
+    /**
+     Removes and Returns the element at the end of the Collection
+     
+     - Complexity: O(1)
+     
+     - Warning: It has not been tested
+     
+     - Returns: The last element of the collection or `nil` if empty
+     */
     public func removeLast() -> Element? {
         let tmp = scrollList.getFirst()!.removeLast()
         removeUpperCascaded()
@@ -95,20 +133,44 @@ public class PerformanceList<Element> {
         return tmp
     }
     
+    /**
+     Returns the element at the beginning of the Collection
+     
+     - Complexity: O(1)
+     
+     - Returns: The first element of the collection or `nil` if empty
+     */
     public func getFirst() -> Element? {
         return scrollList.getFirst()!.getFirst()
     }
     
+    /**
+     Returns the element at the end of the Collection
+     
+     - Complexity: O(1)
+     
+     - Returns: The last element of the collection or `nil` if empty
+     */
     public func getLast() -> Element? {
         return scrollList.getFirst()!.getLast()
     }
     
     //----------------------------------------------------------------------------
     
-    //Subscript functions
+    //Subscript functions (All the functions that help the Subscript)
     //----------------------------------------------------------------------------
     
-    //TODO: If needed add a way to count from the end
+    /**
+     Allows for a fast and convenient search of elements using indexes like an array
+     
+     - Parameters:
+     - Parameter position: The position of the element in the Collection
+     
+     - Complexity: O(log n) or O(1) if the element is next to the last items taken
+     
+     - Returns: The element at the nth position in the Collection
+     
+     */
     public subscript(position: Int) -> Element {
         
         get{
@@ -121,13 +183,25 @@ public class PerformanceList<Element> {
         
     }
     
+    /**
+     The function used by the subscript to get the element in the Collection.
+     Still delegates to another subfunction if the element is not next to the previous taken
+     
+     - Parameters:
+     - Parameter position: The position of the element in the Collection
+     
+     - Complexity: O(log n) or O(1) if the element is next to the last items taken
+     
+     - Returns: The element at the nth position in the Collection
+     
+     */
     private func efficientSearch(position: Int) -> DoublyLinkedNode<Element> {
         //Starting from the most external Layer
         if lastItemTaken != nil {
             if abs(distance(from: lastItemTaken!.index, to: position)) == 1 {
                 
 #if DEBUG
-       print("Taking one step at a time")
+                print("Taking one step at a time")
 #endif
                 
                 if position > lastItemTaken!.index {
@@ -150,6 +224,18 @@ public class PerformanceList<Element> {
         return tmp
     }
     
+    //TODO: If needed add a way to count from the end
+    /**
+     The **Actual** function used by the subscript to get the element in the Collection.
+     
+     - Parameters:
+     - Parameter position: The position of the element in the Collection
+     
+     - Complexity: O(log n)
+     
+     - Returns: The element at the nth position in the Collection
+     
+     */
     private func searchWithIndex(position: Int) -> DoublyLinkedNode<Element> {
         var counter : Int = scrollList.count - 1
         var tempNode : DoublyLinkedNode<Element> = DoublyLinkedNode()
@@ -283,6 +369,19 @@ public class PerformanceList<Element> {
         
     }
     
+    //TODO: Search a new way to get the offset of the first element of the last layer
+    /**
+     Counts the elements that are before the first element of the most external layer of nodes and updates the internal counter
+     
+     - Parameters:
+     - Parameter layer: The first layer with a node
+     
+     - Attention: It is called only if the list is updated, otherwise it is never called
+     
+     - Complexity: O(log n)
+     
+     - Returns: The offset of the first element of the most external layer of nodes
+     */
     private func countStartOffset(layer: Int) -> Int {
         
         dirty = false
@@ -334,6 +433,7 @@ public class PerformanceList<Element> {
         
     }
     
+    ///Returns the distance between 2 indices
     private func distance(from: Int, to: Int) -> Int {
         
         return to - from
