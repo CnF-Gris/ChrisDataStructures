@@ -205,12 +205,12 @@ public class PerformanceList<Element> {
 #endif
                 
                 if position > lastItemTaken!.index {
-                    let tmp = lastItemTaken!.node.next!
+                    let tmp = lastItemTaken!.node.rightNode!
                     let tmpIndex = lastItemTaken!.index
                     lastItemTaken = (node: tmp, index: tmpIndex + 1)
                     return tmp
                 } else {
-                    let tmp = lastItemTaken!.node.previous!
+                    let tmp = lastItemTaken!.node.leftNode!
                     let tmpIndex = lastItemTaken!.index
                     lastItemTaken = (node: tmp, index: tmpIndex - 1)
                     return tmp
@@ -287,11 +287,11 @@ public class PerformanceList<Element> {
                     var i = 0
                     var repeatCycle = true
                     while i < stepNeeded && repeatCycle{
-                        if supportNode.previous is ThreeDirectionNode<Element> {
+                        if supportNode.leftNode is ThreeDirectionNode<Element> {
 #if DEBUG
                             debugSteps = debugSteps + 1
 #endif
-                            supportNode = supportNode.previous! as! ThreeDirectionNode<Element>
+                            supportNode = supportNode.leftNode! as! ThreeDirectionNode<Element>
                             i = i + 1
                             
                         } else {
@@ -304,11 +304,11 @@ public class PerformanceList<Element> {
                     var repeatCycle = true
                     while i < stepNeeded && repeatCycle{
                         
-                        if supportNode.next is ThreeDirectionNode<Element> {
+                        if supportNode.rightNode is ThreeDirectionNode<Element> {
 #if DEBUG
                             debugSteps = debugSteps + 1
 #endif
-                            supportNode = supportNode.next! as! ThreeDirectionNode<Element>
+                            supportNode = supportNode.rightNode! as! ThreeDirectionNode<Element>
                             i = i + 1
                             
                         } else {
@@ -345,7 +345,7 @@ public class PerformanceList<Element> {
 #if DEBUG
                         debugSteps = debugSteps + 1
 #endif
-                        tempNode = tempNode.previous!
+                        tempNode = tempNode.leftNode!
                     }
                     currentPosition = currentPosition - remainingDistance
                 } else {
@@ -353,7 +353,7 @@ public class PerformanceList<Element> {
 #if DEBUG
                         debugSteps = debugSteps + 1
 #endif
-                        tempNode = tempNode.next!
+                        tempNode = tempNode.rightNode!
                     }
                     currentPosition = currentPosition + remainingDistance
                 }
@@ -416,7 +416,7 @@ public class PerformanceList<Element> {
                 } else {
                     offset = offset + 1
                 }
-                node = node!.previous
+                node = node!.leftNode
             }
             
             
