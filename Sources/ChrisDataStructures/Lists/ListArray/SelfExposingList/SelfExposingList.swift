@@ -62,18 +62,38 @@ internal class SelfExposingList<Element> {
         
     }
     
+    public func addFirst(node: Node4D<Element>) -> Node4D<Element>? {
+        
+        
+        if addBetween(leftNode: header, node: node, rightNode: header.rightNode) {
+            return exposeNode(node: node, operationType: .addFirst)?.exposedNode
+        }
+        
+        return nil
+        
+    }
+    
+    public func addLast(node: Node4D<Element>) -> Node4D<Element>? {
+        
+        
+        if addBetween(leftNode: trailer.leftNode, node: node, rightNode: trailer) {
+            return exposeNode(node: node, operationType: .addLast)?.exposedNode
+        }
+        
+        return nil
+        
+    }
+    
 //    public func addFromDown() -> Element? {
 //
 //
 //
 //    }
     
-    internal func addElement(after node: Node4D<Element>, element: Element)
+    internal func addElement(after node: Node4D<Element>, bufferNode: Node4D<Element>)
     -> (exposedNode: Node4D<Element>,
         upperLeftNode: Node4D<Element>?,
         upperRightNode: Node4D<Element>?)? {
-        
-        let bufferNode = Node4D(element: element)
         
         if addBetween(leftNode: node, node: bufferNode, rightNode: node.rightNode) {
             return exposeNode(node: bufferNode, operationType: .addBetween)
@@ -83,20 +103,19 @@ internal class SelfExposingList<Element> {
         
     }
     
-    internal func addElement(before: Node4D<Element>, element: Element)
+    internal func addElement(before node: Node4D<Element>, bufferNode: Node4D<Element>)
     -> (exposedNode: Node4D<Element>,
         upperLeftNode: Node4D<Element>?,
         upperRightNode: Node4D<Element>?)? {
         
-        let bufferNode = Node4D(element: element)
-        
-        if addBetween(leftNode: header, node: bufferNode, rightNode: header.rightNode) {
+        if addBetween(leftNode: node.leftNode, node: bufferNode, rightNode: node) {
             return exposeNode(node: bufferNode, operationType: .addBetween)
         }
         
         return nil
         
     }
+    
     
     @inline(__always)
     internal func getFirst() -> Node4D<Element> {
