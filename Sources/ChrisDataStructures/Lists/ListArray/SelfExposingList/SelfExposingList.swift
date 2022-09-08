@@ -18,7 +18,7 @@ internal class SelfExposingList<Element> {
     
     private var startOffset: Int
     private var endOffset: Int
-    private let divider: Int
+    internal let divider: Int
     
     init(divider: Int) {
         
@@ -118,16 +118,23 @@ internal class SelfExposingList<Element> {
     
     
     @inline(__always)
-    internal func getFirst() -> Node4D<Element> {
+    internal func getFirst() -> Node4D<Element>? {
+        if isEmpty {
+            return nil
+        }
         return header.rightNode
     }
     
     @inline(__always)
-    internal func getLast() -> Node4D<Element> {
+    internal func getLast() -> Node4D<Element>? {
+        if isEmpty {
+            return nil
+        }
+
         return trailer.leftNode
     }
     
-    public func removeFirst() -> (Element, ListOperation?)? {
+    public func removeFirst() -> (Node4D<Element>, ListOperation?)? {
         
         if isEmpty {
             return nil
@@ -139,7 +146,7 @@ internal class SelfExposingList<Element> {
         
     }
     
-    public func removeLast() -> (Element, ListOperation?)? {
+    public func removeLast() -> (Node4D<Element>, ListOperation?)? {
         
         if isEmpty {
             return nil
@@ -158,7 +165,7 @@ internal class SelfExposingList<Element> {
 //    }
     
     //Theoretically, it should need a position and then a subscript, BUT the actual structure will have the subscript, so this one can just receive the parameter
-    public func removeElement(node: Node4D<Element>) -> (element: Element, operation: ListOperation?, upperLeftNode: Node4D<Element>?, upperRightNode: Node4D<Element>?)? {
+    public func removeElement(node: Node4D<Element>) -> (removedNode: Node4D<Element>, operation: ListOperation?, upperLeftNode: Node4D<Element>?, upperRightNode: Node4D<Element>?)? {
         
         if isEmpty {
             return nil
@@ -185,7 +192,7 @@ internal class SelfExposingList<Element> {
         
     }
     
-    private func removeBetween(node: Node4D<Element>) -> Element {
+    private func removeBetween(node: Node4D<Element>) -> Node4D<Element> {
         
         let leftNode = node.leftNode
         let rightNode = node.rightNode
@@ -198,7 +205,7 @@ internal class SelfExposingList<Element> {
         
         count = count - 1
         
-        return node.element
+        return node
         
     }
     //Delegating to the real structure for the section offsets
@@ -329,6 +336,7 @@ internal class SelfExposingList<Element> {
         
         case .removeFirst:
             if startOffset == 0 { //Collapse
+                startOffset = divider - 1
                 return (.collapse, nil, nil) //Delegating to the real struct for cascaded removal
             }
         case .removeBetween:
@@ -344,12 +352,14 @@ internal class SelfExposingList<Element> {
             if node_L === header {
                 
                 if startOffset == 0 { //Collapse
+                    startOffset = divider - 1
                     return (.collapse, nil, nil) //Delegating to the real struct for cascaded removal
                 }
                 
             } else if node_R === trailer {
                 
                 if endOffset == 0 { //Collapse
+                    endOffset = divider - 1
                     return (.collapse, nil, nil) //Delegating to the real struct for cascaded removal
                 }
                 
@@ -371,7 +381,7 @@ internal class SelfExposingList<Element> {
                             pillar_R.lowerLevelNode = pillar_R.lowerLevelNode!.leftNode
                         }
                         
-                        return nil
+                        return (.expand, pillar_L, pillar_R)
                         
                     } else if pillar_R.localOffset_R > 0 {
                         
@@ -384,7 +394,7 @@ internal class SelfExposingList<Element> {
                             pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.rightNode
                         }
                         
-                        return nil
+                        return (.expand, pillar_L, pillar_R)
                         
                     } else {
                         
@@ -407,7 +417,7 @@ internal class SelfExposingList<Element> {
                     pillar_L.localOffset_R = pillar_L.localOffset_R - 1
                     pillar_R.localOffset_L = pillar_R.localOffset_L - 1
                     
-                    return nil
+                    return (.expand, pillar_L, pillar_R)
                     
                 }
                 
@@ -415,6 +425,7 @@ internal class SelfExposingList<Element> {
 
         case .removeLast:
             if endOffset == 0 { //Collapse
+                endOffset = divider - 1
                 return (.collapse, nil, nil) //Delegating to the real struct for cascaded removal
             }
         default:
@@ -426,7 +437,7 @@ internal class SelfExposingList<Element> {
     }
     
     //TODO: Make more research for actual iteration numbers
-    private func lockNodes(node: Node4D<Element>, operation: ListOperation) -> (leftPillar:  Node4D<Element>,rightPillar: Node4D<Element>) {
+    internal func lockNodes(node: Node4D<Element>, operation: ListOperation) -> (leftPillar:  Node4D<Element>,rightPillar: Node4D<Element>) {
         
         let stop : Int
         
@@ -474,7 +485,7 @@ internal class SelfExposingList<Element> {
         }
         
         //Just to be sure, but according to calculation, it should be fine
-        return (leftNode.upperLevelNode!, rightNode.upperLevelNode!)
+        return (leftNode, rightNode)
         
     }
     
