@@ -13,9 +13,14 @@ internal enum ListOperation {
     case addBetween
     case addLast
     
+    case firstExposure
+    
     case removeFirst
     case removeBetween
     case removeLast
+    
+    case after
+    case before
     
     case expand
     case collapse
