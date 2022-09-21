@@ -137,7 +137,7 @@ internal class SelfExposingList<Element> {
             
         }
         
-        return responseMessage(nodes: [node, nodes[0]!, nodes[1]!], operationType: .removeBetween, result: .delegating)
+        return responseMessage(nodes: [node, nodes[0]!, nodes[1]!], operationType: .removeBetween, result: .notifyContraction)
         
     }
     //--------------------------------------------------------------------------------------
@@ -355,6 +355,15 @@ internal class SelfExposingList<Element> {
         }
             
         return [node_L, node_R]
+    }
+    
+    internal func notifyInsertion(left: Node4D<Element> , right: Node4D<Element>) -> [Node4D<Element>?] {
+        
+        left.sectionOffset_R =  left.sectionOffset_R + 1
+        right.sectionOffset_L =  left.sectionOffset_R
+        
+        return sectionLocker(node: left)
+        
     }
     //--------------------------------------------------------------------------------------
     
