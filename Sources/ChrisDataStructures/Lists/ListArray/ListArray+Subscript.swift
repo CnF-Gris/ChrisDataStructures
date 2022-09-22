@@ -58,11 +58,11 @@ extension ListArray : RandomAccessCollection, Collection {
             if currentLayer > 0 {
                 
                 var tmp = 100
-                
-                for i in 2...currentLayer {
-                    tmp = tmp * layers[i].divider
+                if currentLayer >= 2 {
+                    for i in 2...currentLayer {
+                        tmp = tmp * layers[i].divider
+                    }
                 }
-                
                 layerConstantOffset = tmp
                 
             } else {
@@ -71,7 +71,7 @@ extension ListArray : RandomAccessCollection, Collection {
             
             if distance(from: currentPosition, to: position) > 0 {
                 
-                while (distance(from: currentPosition, to: position) - (currentNode.sectionOffset_R + layerConstantOffset)) > 0 {
+                while (distance(from: currentPosition, to: position) - (currentNode.sectionOffset_R + layerConstantOffset)) >= 0 {
                     
                     currentPosition = currentPosition + (currentNode.sectionOffset_R + layerConstantOffset)
                     currentNode = currentNode.rightNode
@@ -80,7 +80,7 @@ extension ListArray : RandomAccessCollection, Collection {
                 
             } else if distance(from: currentPosition, to: position) < 0 && currentLayer < layers.count - 1 {
                 
-                while (abs(distance(from: currentPosition, to: position)) - (currentNode.sectionOffset_L + layerConstantOffset)) > 0 {
+                while (abs(distance(from: currentPosition, to: position)) - (currentNode.sectionOffset_L + layerConstantOffset)) >= 0 {
                     
                     currentPosition = currentPosition - (currentNode.sectionOffset_L + layerConstantOffset)
                     currentNode = currentNode.leftNode
@@ -117,7 +117,7 @@ extension ListArray : RandomAccessCollection, Collection {
         var OFFSET = base.startOffset
         var currentLayer = 1 //Like Indices
             
-        while currentLayer < layers.count {
+        while currentLayer < layers.count - 1 {
             
             var node = layers[currentLayer].getFirst()!
             

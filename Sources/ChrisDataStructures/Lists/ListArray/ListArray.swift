@@ -170,9 +170,11 @@ public class ListArray<Element> {
                     
                 case .addFirst:
                     tmp.lowerLevelNode = currentMessage.nodes[0]
+                    currentMessage.nodes[0].upperLevelNode = tmp
                     currentMessage = layers[currentLayer + 1].addFirst(node: tmp)
                 case .addLast:
                     tmp.lowerLevelNode = currentMessage.nodes[0]
+                    currentMessage.nodes[0].upperLevelNode = tmp
                     currentMessage = layers[currentLayer + 1].addLast(node: tmp)
                 default:
                     throw ListArrayExceptions.IllegalActionException
@@ -186,6 +188,10 @@ public class ListArray<Element> {
                 
                 tmp_L.lowerLevelNode = currentMessage.nodes[0]
                 tmp_R.lowerLevelNode = currentMessage.nodes[1]
+                
+                currentMessage.nodes[0].upperLevelNode = tmp_L
+                currentMessage.nodes[1].upperLevelNode = tmp_R
+                
                 
                 if layers.count <= currentLayer + 1 {
                     layers.addLast(SelfExposingList(divider: 10))
@@ -233,7 +239,7 @@ public class ListArray<Element> {
         
         var repeatCycle = true
         
-        while repeatCycle && currentLayer < layers.count {
+        while repeatCycle && currentLayer < layers.count - 1 {
             
             pillar_L = currentMessage.nodes[1].upperLevelNode!
             pillar_R =  currentMessage.nodes[2].upperLevelNode!
@@ -262,6 +268,7 @@ public class ListArray<Element> {
                 
                 let tmp = Node4D<Element>()
                 tmp.lowerLevelNode = node
+                node.upperLevelNode = tmp
                 
                 currentMessage = try! layers[currentLayer + 1].addBetween(add: tmp, how: .after, target: pillar_L)
                 

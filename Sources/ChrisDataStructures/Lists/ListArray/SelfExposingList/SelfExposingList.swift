@@ -334,13 +334,13 @@ internal class SelfExposingList<Element> {
         
         var Booleans = try! sectionLockerHelper(node_L: node_L, node_R: node_R)
         
-        while Booleans[1] {
+        while Booleans[0] {
             
-            if !Booleans[2] {
+            if !Booleans[1] {
                 node_L = node_L.leftNode
             }
             
-            if !Booleans[3] {
+            if !Booleans[2] {
                 node_R = node_R.rightNode
             }
             
@@ -348,9 +348,9 @@ internal class SelfExposingList<Element> {
 
         }
         
-        if Booleans[4] {
+        if Booleans[3] {
             return [nil, node_R]
-        } else if Booleans[5] {
+        } else if Booleans[4] {
             return [node_L, nil]
         }
             
@@ -424,7 +424,7 @@ internal class SelfExposingList<Element> {
             throw ListArrayExceptions.SplitterNotFoundException
         }
         
-        return [WHILE, L_IS_HEADER, R_IS_TRAILER]
+        return [WHILE,L_FOUND, R_FOUND, L_IS_HEADER, R_IS_TRAILER]
         
     }
     //--------------------------------------------------------------------------------------
