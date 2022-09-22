@@ -13,12 +13,12 @@ internal class Node4D<Element> {
     ///
     ///- Attention:
     ///It may be `nil` if there's either no element or you are on the Lowest Level
-    public unowned var lowerLevelNode : Node4D<Element>?
+    public weak var lowerLevelNode : Node4D<Element>?
     ///Node to the Upper Layer
     ///
     ///- Attention:
     ///It may be `nil` if there's either no element or you are on the Uppest Level
-    public unowned var upperLevelNode: Node4D<Element>?
+    public weak var upperLevelNode: Node4D<Element>?
     ///Node to the left node
     public var leftNode: Node4D<Element>!
     ///Node to the left node

@@ -13,4 +13,7 @@ internal enum ListArrayExceptions : Error {
     case IllegalActionException
     case IllegalStateException
     
+    case IndexOutOfBoundException
+    case IndexNotReachedException
+    
 }

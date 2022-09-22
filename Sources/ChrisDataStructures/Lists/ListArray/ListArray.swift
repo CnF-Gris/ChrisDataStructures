@@ -1,498 +1,495 @@
 //
 //  File.swift
-//  
+//
 //  TODO: CHECK IF YOU ARE ADDING NODES OF THE LOWER LAYERS DIRECTLY BEFORE WRAPPING
 //
 //  Created by Christian Risi on 29/08/22.
-//
-//
-//import Foundation
-//
-//public class ListArray<Element> {
-//
-//    internal var layers : DoublyLinkedList<SelfExposingList<Element>>
-//
-//    public var count : Int { return layers.getFirst()!.count}
-//    public var isEmpty : Bool {return count == 0}
-//
-//    public init() {
-//
-//        layers = DoublyLinkedList()
-//        layers.addFirst(SelfExposingList<Element>(divider: 100))
-//
-//    }
-//
-//    public func addFirst(_ element: Element){
-//
-//        if let exposedNode = layers.getFirst()!.addFirst(element: element) {
-//            layering_F(node: exposedNode)
-//        }
-//
-//    }
-//
-//    public func addLast(_ element: Element){
-//
-//        if let exposedNode = layers.getFirst()!.addLast(element: element) {
-//            layering_L(node: exposedNode)
-//        }
-//
-//    }
-//
-//    public func addElement(before: Int, element: Element) {
-//
-//        let list =  layers.getFirst()!
-//        let bufferNode = Node4D<Element>(element: element)
-//        var currentLayer = 1
-//
-//        var result = list.addElement(before: try! efficentSeach(position: before), bufferNode: bufferNode)
-//
-//        while result != nil {
-//
-//            if result!.upperLeftNode == nil {
-//
-//                if before < (list.count / 2) {
-//
-//                    layering_F(node: result!.exposedNode)
-//
-//                } else {
-//
-//                    layering_L(node: result!.exposedNode)
-//
-//                }
-//
-//            } else {
-//                
-//                var pillar_L : Node4D<Element>
-//                var pillar_R : Node4D<Element>
-//
-//                if result!.exposedNode === bufferNode {
-//
-//                    pillar_L = result!.upperLeftNode!
-//                    pillar_R = result!.upperRightNode!
-//
-//                    //Notify changes
-//                    addSectionOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                } else {
-//
-//                    //Add a new node
-//                    addLayer(layer: currentLayer)
-//                    result = layers[currentLayer].addElement(after: result!.upperLeftNode!, bufferNode: result!.exposedNode)
-//
-//                    pillar_L = result!.upperLeftNode!
-//                    pillar_R = result!.upperRightNode!
-//
-//                    pillar_L.rightNode = result!.exposedNode
-//                    pillar_R.leftNode = result!.exposedNode
-//
-//                    if currentLayer == 1 {
-//
-//                        pillar_L.sectionOffset_R = 0
-//                        pillar_R.sectionOffset_L = 0
-//
-//                    } else {
-//
-//                        findNewOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                    }
-//
-//
-//
-//                }
-//
-//            }
-//
-//            currentLayer = currentLayer + 1
-//
-//        }
-//
-//    }
-//
-//    public func addElement(after: Int, element: Element) {
-//
-//        let list =  layers.getFirst()!
-//        let bufferNode = Node4D<Element>(element: element)
-//        var currentLayer = 1
-//
-//        var result = list.addElement(before: try! efficentSeach(position: after), bufferNode: bufferNode)
-//
-//        while result != nil {
-//
-//            if result!.upperLeftNode == nil {
-//
-//                if after < (list.count / 2) {
-//
-//                    layering_F(node: result!.exposedNode)
-//
-//                } else {
-//
-//                    layering_L(node: result!.exposedNode)
-//
-//                }
-//
-//            } else {
-//
-//                var pillar_L : Node4D<Element>
-//                var pillar_R : Node4D<Element>
-//
-//                if result!.exposedNode === bufferNode {
-//
-//                    pillar_L = result!.upperLeftNode!
-//                    pillar_R = result!.upperRightNode!
-//
-//                    //Notify changes
-//                    addSectionOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                } else {
-//
-//                    //Add a new node
-//                    addLayer(layer: currentLayer)
-//                    result = layers[currentLayer].addElement(after: result!.upperLeftNode!, bufferNode: result!.exposedNode)
-//
-//                    pillar_L = result!.upperLeftNode!
-//                    pillar_R = result!.upperRightNode!
-//
-//                    pillar_L.rightNode = result!.exposedNode
-//                    pillar_R.leftNode = result!.exposedNode
-//
-//                    if currentLayer == 1 {
-//
-//                        pillar_L.sectionOffset_R = 0
-//                        pillar_R.sectionOffset_L = 0
-//
-//                    } else {
-//
-//                        findNewOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                    }
-//
-//
-//
-//                }
-//
-//            }
-//
-//            currentLayer = currentLayer + 1
-//
-//        }
-//
-//    }
-//
-//    public func removeFirst() -> Element? {
-//
-//        //Take the first element from the List
-//        //Apply the method of removal
-//        //Return its result
-//
-//        if let result = layers.getFirst()!.removeFirst() {
-//
-//            //result is not nil
-//            if result.1 == .collapse {
-//
-//                collapse_F(layerLevel: 1)
-//
-//            }
-//
-//            return result.0.element
-//
-//        }
-//
-//        return nil
-//
-//    }
-//
-//    public func removeLast() -> Element? {
-//
-//        //Take the first element from the List
-//        //Apply the method of removal
-//        //Return its result
-//
-//        if let result = layers.getFirst()!.removeLast() {
-//
-//            //result is not nil
-//            if result.1 == .collapse {
-//
-//                collapse_L(layerLevel: 1)
-//
-//            }
-//
-//            return result.0.element
-//
-//        }
-//
-//        return nil
-//
-//    }
-//
-//    public func removeElement(at position: Int) -> Element? {
-//
-//        let result = layers.getFirst()!.removeElement(node: try! self.efficentSeach(position: position))  //I want it to block things out
-//
-//        var layerLevel = 1
-//        var tmp = result
-//
-//        while layerLevel < layers.count {
-//
-//            if tmp!.operation == .collapse {
-//
-//                if tmp!.upperLeftNode == nil {
-//
-//                    if position < count/2 {
-//
-//                        collapse_F(layerLevel: layerLevel) //They will end the remaining cascaded collapse
-//                        return result!.removedNode.element
-//
-//                    } else {
-//
-//                        collapse_L(layerLevel: layerLevel) //They will end the cascaded collapse
-//                        return result!.removedNode.element
-//
-//                    }
-//
-//                } else {
-//
-//                    var pillar_L = tmp!.upperLeftNode!
-//
-//                    tmp = layers[layerLevel].removeElement(node: result!.upperRightNode!)
-//
-//                    if layerLevel == 1 {
-//
-//                        pillar_L.sectionOffset_R = layers[1].divider - 1
-//                        pillar_L.rightNode.sectionOffset_L = layers[1].divider - 1
-//
-//                    } else {
-//
-//                        var pillar_R = pillar_L.rightNode!
-//                        findNewOffsetOnRemoval(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                    }
-//
-//                    layerLevel = layerLevel + 1
-//
-//
-//
-//                }
-//
-//            } else if var pillar_L = tmp?.upperLeftNode { //contracted -> Still notify changes
-//
-//                var pillar_R = tmp!.upperRightNode!
-//
-//                removeSectionOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                while layerLevel < layers.count - 1 {
-//
-//                    let pillars = layers[layerLevel].lockNodes(node: pillar_L , operation: .addBetween)
-//                    pillar_L = pillars.leftPillar
-//                    pillar_R = pillars.rightPillar
-//
-//                    removeSectionOffset(pillar_L: &pillar_L, pillar_R: &pillar_R)
-//
-//                    layerLevel = layerLevel + 1
-//
-//                }
-//
-//                layerLevel = layers.count
-//
-//            }
-//
-//        }
-//
-//        if result != nil {
-//
-//            return result!.removedNode.element
-//
-//        }
-//
-//        return nil
-//
-//    }
-//
-//    @inline(__always)
-//    private func layering_F(node: Node4D<Element>) {
-//
-//        var bufferNode : Node4D<Element>? = node
-//        var currentLayer = 1 //The layer where we are going to operate equals to the count we want
-//
-//        while bufferNode != nil {
-//
-//            addLayer(layer: currentLayer)
-//            bufferNode = layers[currentLayer].addFirst(node: bufferNode!)
-//            currentLayer = currentLayer + 1
-//
-//        }
-//
-//    }
-//
-//    @inline(__always)
-//    private func layering_L(node: Node4D<Element>) {
-//
-//        var bufferNode : Node4D<Element>? = node
-//        var currentLayer = 1 //The layer where we are going to operate equals to the count we want
-//
-//        while bufferNode != nil {
-//
-//            addLayer(layer: currentLayer)
-//            bufferNode = layers[currentLayer].addLast(node: bufferNode!)
-//            currentLayer = currentLayer + 1
-//
-//        }
-//
-//    }
-//
-//    @inline(__always)
-//    private func addLayer(layer: Int) {
-//
-//        if layer + 1 > layers.count {
-//
-//            layers.addLast(SelfExposingList(divider: 10))
-//
-//        }
-//
-//    }
-//
-//    @inline(__always)
-//    private func collapse_F(layerLevel: Int) {
-//
-//        //This is where the unowned property comes handy
-//        var count = layerLevel
-//
-//        while count < layers.count {
-//
-//            let element = layers[count].getFirst()
-//
-//            if element!.lowerLevelNode == nil {
-//
-//                let result = layers[count].removeFirst()
-//
-//                if let node = layers[count].getFirst() {
-//                    node.sectionOffset_L = 0
-//                }
-//
-//                if layers[count].isEmpty {
-//
-//                    removeLayer()
-//
-//                }
-//
-//                if result?.1 != .collapse {
-//
-//                    count = layers.count //exit from the cycle
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-//
-//    @inline(__always)
-//    private func collapse_L(layerLevel: Int) {
-//
-//        //This is where the unowned property comes handy
-//        var count = layerLevel
-//
-//        while count < layers.count - 1 {
-//
-//            let element = layers[count].getLast()
-//
-//            if element!.lowerLevelNode == nil {
-//
-//                let result = layers[count].removeLast()
-//
-//                if let node = layers[count].getLast() {
-//                    node.sectionOffset_R = 0
-//                }
-//
-//
-//                if layers[count].isEmpty {
-//
-//                    removeLayer()
-//
-//                }
-//
-//                if result?.1 != .collapse {
-//
-//                    count = layers.count //exit from the cycle
-//
-//                }
-//
-//            }
-//
-//        }
-//
-//    }
-//
-//    @inline(__always)
-//    private func removeLayer() {
-//
-//        let _ = layers.removeLast()
-//
-//    }
-//
-//    @inline(__always)
-//    private func addSectionOffset( pillar_L: inout Node4D<Element>, pillar_R: inout Node4D<Element>) {
-//
-//        pillar_L.sectionOffset_L =  pillar_L.sectionOffset_L + 1
-//        pillar_R.sectionOffset_R = pillar_R.sectionOffset_R + 1
-//
-//    }
-//
-//    @inline(__always)
-//    private func removeSectionOffset( pillar_L: inout Node4D<Element>, pillar_R: inout Node4D<Element>) {
-//
-//        pillar_L.sectionOffset_L =  pillar_L.sectionOffset_L - 1
-//        pillar_R.sectionOffset_R = pillar_R.sectionOffset_R - 1
-//
-//    }
-//
-//    @inline(__always)
-//    private func findNewOffset( pillar_L: inout Node4D<Element>, pillar_R: inout Node4D<Element>) {
-//
-//        let node = pillar_L.rightNode!
-//        var buffer_L = pillar_L.lowerLevelNode!
-//        var buffer_R = pillar_R.lowerLevelNode!
-//
-//        pillar_L.sectionOffset_R = 0
-//        pillar_R.sectionOffset_L = 0
-//
-//        while buffer_L.upperLevelNode !== node {
-//
-//            pillar_L.sectionOffset_R = pillar_L.sectionOffset_R + buffer_L.sectionOffset_R
-//            buffer_L = buffer_L.rightNode!
-//
-//        }
-//
-//        while buffer_R.upperLevelNode !== node {
-//
-//            pillar_R.sectionOffset_L = pillar_R.sectionOffset_L + buffer_R.sectionOffset_R
-//            buffer_R = buffer_R.leftNode
-//
-//        }
-//
-//        node.sectionOffset_L = pillar_L.sectionOffset_R
-//        node.sectionOffset_R = pillar_R.sectionOffset_L
-//
-//    }
-//
-//    @inline(__always)
-//    private func findNewOffsetOnRemoval( pillar_L: inout Node4D<Element>, pillar_R: inout Node4D<Element>) {
-//
-//        var buffer_L = pillar_L.lowerLevelNode!
-//
-//        pillar_L.sectionOffset_R = 0
-//        pillar_R.sectionOffset_L = 0
-//
-//        while buffer_L.upperLevelNode !== pillar_R {
-//
-//            pillar_L.sectionOffset_R = pillar_L.sectionOffset_R + buffer_L.sectionOffset_R
-//            buffer_L = buffer_L.rightNode!
-//
-//        }
-//
-//        pillar_R.sectionOffset_L = pillar_L.sectionOffset_L
-//
-//    }
-//
-//
-//}
+
+
+import Foundation
+
+public class ListArray<Element> {
+    
+    internal var layers : DoublyLinkedList<SelfExposingList<Element>>
+    internal var base : SelfExposingList<Element> {return layers.getFirst()!}
+    
+    public var count : Int { return layers.getFirst()!.count}
+    public var isEmpty : Bool {return count == 0}
+    private unowned var lastTakenNode : Node4D<Element>?
+    
+    public init() {
+        
+        layers = DoublyLinkedList()
+        layers.addFirst(SelfExposingList<Element>(divider: 100))
+        
+    }
+    
+    //MARK: Public functions
+    //--------------------------------------------------------------------------------------
+    public func getFirst() -> Element? {
+        
+        if let node = base.getFirst() {
+            return node.element
+        }
+        
+        return nil
+    }
+    
+    public func getLast() -> Element? {
+        
+        if let node = base.getLast() {
+            return node.element
+        }
+        
+        return nil
+    }
+    
+    public func addFirst(_ item: Element) {
+        let node2Add = Node4D(element: item)
+        
+        let response = base.addFirst(node: node2Add)
+        
+        if response.result == .delegating {
+            try! kernelAdd(message: response)
+        }
+        
+    }
+    
+    public func addLast(_ item: Element) {
+        let node2Add = Node4D(element: item)
+        
+        let response = layers.getFirst()!.addLast(node: node2Add)
+        
+        if response.result == .delegating {
+            try! kernelAdd(message: response)
+        }
+    }
+    
+    public func addBefore(position: Int, item: Element) {
+        
+        let target = try! efficentSeach(position: position) //To be implemented
+        let node2Add = Node4D(element: item)
+        
+        let message = try! base.addBetween(add: node2Add, how: .before, target: target)
+        
+        if message.result == .delegating {
+            
+            try! kernelAdd(message: message)
+            
+        } else {
+            
+            kernelExpansion(message: message)
+            
+        }
+        
+    }
+    
+    public func addAfter(position: Int, item: Element) {
+        
+        let target = try! efficentSeach(position: position) //To be implemented
+        let node2Add = Node4D(element: item)
+        
+        let message = try! base.addBetween(add: node2Add, how: .after, target: target)
+        
+        if message.result == .delegating {
+            
+            try! kernelAdd(message: message)
+            
+        } else {
+            
+            kernelExpansion(message: message)
+            
+        }
+        
+    }
+    
+    public func removeFirst() -> Element? {
+        if isEmpty {
+            return nil
+        }
+        
+        let response = base.removeFirst()
+        
+        if response.result == .delegating {
+            try! kernelRemove(message: response)
+        }
+        
+        return response.nodes[0].element
+    }
+    
+    public func removeLast() -> Element? {
+        if isEmpty {
+            return nil
+        }
+        
+        let response = base.removeLast()
+        
+        if response.result == .delegating {
+            try! kernelRemove(message: response)
+        }
+        
+        return response.nodes[0].element
+    }
+    
+    public func removeAt(position: Int) -> Element? {
+        
+        if isEmpty {
+            return nil
+        }
+        
+        let response = base.removeNode(remove: try! efficentSeach(position: position))
+        
+        if response.result == .delegating {
+            try! kernelRemove(message: response)
+        } else if response.result == .notifyContraction {
+            
+        }
+        
+        return response.nodes[0].element
+        
+    }
+    //--------------------------------------------------------------------------------------
+    
+    //MARK: Private "Kernel" Functions
+    //--------------------------------------------------------------------------------------
+    
+    //This method is ok for AddFirst an AddLast and some cases of AddBetween, but the latter needs another method
+    private func kernelAdd(message: responseMessage<Element>) throws {
+        
+        var currentMessage = message
+        var currentLayer = 0 //Like indeces
+        
+       
+        
+        while currentMessage.result == .delegating {
+            
+            if currentMessage.count == 1 {
+                
+                let tmp = Node4D<Element>()
+                switch currentMessage.operationType {
+                    
+                case .addFirst:
+                    tmp.lowerLevelNode = currentMessage.nodes[0]
+                    currentMessage = layers[currentLayer + 1].addFirst(node: tmp)
+                case .addLast:
+                    tmp.lowerLevelNode = currentMessage.nodes[0]
+                    currentMessage = layers[currentLayer + 1].addLast(node: tmp)
+                default:
+                    throw ListArrayExceptions.IllegalActionException
+                }
+                
+                
+            } else if currentMessage.count == 2 { //Common zone for every adding operation
+                
+                let tmp_L = Node4D<Element>()
+                let tmp_R = Node4D<Element>()
+                
+                tmp_L.lowerLevelNode = currentMessage.nodes[0]
+                tmp_R.lowerLevelNode = currentMessage.nodes[1]
+                
+                if layers.count <= currentLayer + 1 {
+                    layers.addLast(SelfExposingList(divider: 10))
+                }
+                
+                
+                let _ = layers[currentLayer + 1].addFirst(node: tmp_L)
+                currentMessage = layers[currentLayer + 1].addLast(node: tmp_R)
+                
+            }
+            
+            currentLayer = currentLayer + 1
+        }
+        
+    }
+    
+    private func kernelExpansion(message: responseMessage<Element>) {
+        
+        var currentMessage = message
+        var currentLayer = 0 //Like indeces
+        
+        var pillar_L = message.nodes[1].upperLevelNode!
+        var pillar_R = message.nodes[2].upperLevelNode!
+        
+        //Increasing sectionOffsets
+        //-------------------------------------------------------------------------------------
+        while currentLayer < layers.count {
+            let tmp = layers[currentLayer + 1].notifyInsertion(left: pillar_L, right: pillar_R)
+            
+            if tmp[0] != nil && tmp[1] != nil {
+                
+                pillar_L = tmp[0]!
+                pillar_R = tmp[1]!
+                
+            } else {
+                currentLayer = layers.count
+            }
+        }
+        //-------------------------------------------------------------------------------------
+        
+        //Resetting Variables
+        //------------------------------------------
+        currentLayer = 0
+        //------------------------------------------
+        
+        var repeatCycle = true
+        
+        while repeatCycle && currentLayer < layers.count {
+            
+            pillar_L = currentMessage.nodes[1].upperLevelNode!
+            pillar_R =  currentMessage.nodes[2].upperLevelNode!
+            
+            
+            pillar_L.localOffset_R = pillar_L.localOffset_R + 1
+            pillar_R.localOffset_L = pillar_L.localOffset_R
+            
+            if (pillar_L.localOffset_R % layers[currentLayer + 1].divider - 1) == 0 {
+                
+                //divider - 1
+                
+                pillar_L.localOffset_R = 0
+                pillar_R.localOffset_L = 0
+                
+                pillar_L.sectionOffset_L = 0
+                pillar_R.sectionOffset_R = 0
+                
+                var node = pillar_L.lowerLevelNode!
+                
+                for _ in 0..<layers[currentLayer + 1].divider {
+                    
+                    node = node.rightNode
+                    
+                }
+                
+                let tmp = Node4D<Element>()
+                tmp.lowerLevelNode = node
+                
+                currentMessage = try! layers[currentLayer + 1].addBetween(add: tmp, how: .after, target: pillar_L)
+                
+                //Counting
+                let pillar_M = pillar_L.rightNode!
+                pillar_L.sectionOffset_R = getSectionOffset(pillar: pillar_L)
+                pillar_R.sectionOffset_L = getSectionOffset(pillar: pillar_M)
+                pillar_M.sectionOffset_L = pillar_L.sectionOffset_R
+                pillar_M.sectionOffset_R = pillar_R.sectionOffset_L
+                
+                
+                if currentMessage.count < 3 {
+                    repeatCycle = false
+                    try! kernelAdd(message: currentMessage)
+                }
+                
+                currentLayer = currentLayer + 1
+                
+            } else {
+                
+                repeatCycle = false
+                
+            }
+        }
+        
+    }
+    
+    private func kernelRemove(message: responseMessage<Element>) throws {
+        
+        //now we just said that we were removing a pillar
+        var currentMessage = message
+        var currentLayer = 0
+        
+        while currentMessage.result == .delegating && currentLayer < layers.count - 1{
+            
+            //That's where the unowned property comes handy
+            switch currentMessage.operationType {
+            case .removeFirst:
+                
+                if layers[currentLayer + 1].getFirst()?.lowerLevelNode != nil {
+                    currentMessage = layers[currentLayer + 1].removeFirst()
+                }
+                
+            case .removeLast:
+                
+                if layers[currentLayer + 1].getLast()?.lowerLevelNode != nil {
+                    currentMessage = layers[currentLayer + 1].removeLast()
+                }
+                
+            default:
+                
+                throw ListArrayExceptions.IllegalActionException
+                        
+            }
+            
+            if layers[currentLayer + 1].count < 2 && currentLayer != 0 {
+                
+                let _ = layers[currentLayer + 1].removeFirst()
+                
+                if currentLayer + 1 != layers.count - 1 {
+                    throw ListArrayExceptions.IllegalStateException //Every lower layer should have more nodes than the upper ones
+                }
+                
+                let _ = layers.removeLast() //Removing the last layer
+                
+                
+            }
+            
+            currentLayer = currentLayer + 1
+            
+            
+        }
+        
+    }
+    
+    private func kernelContrction(message: responseMessage<Element>) {
+        
+        var currentMessage = message
+        var currentLayer = 0 //Like indeces
+        var repeatCycle = true
+        var removeSectionOffset = true
+        
+        var pillar_L = message.nodes[1].upperLevelNode!
+        var pillar_R = message.nodes[2].upperLevelNode!
+        
+        
+        
+        //Decreasing sectionOffsets
+        //-------------------------------------------------------------------------------------
+        while repeatCycle && currentLayer < layers.count {
+            
+            repeatCycle = false
+            
+            pillar_L = currentMessage.nodes[1].upperLevelNode!
+            pillar_R =  currentMessage.nodes[2].upperLevelNode!
+            
+            pillar_L.localOffset_R = pillar_L.localOffset_R - 1
+            pillar_R.localOffset_L = pillar_L.localOffset_R
+            
+            if pillar_L.localOffset_R < 0 {
+                
+                //Best cases
+                if pillar_L.localOffset_L > 0 {
+                    
+                    pillar_L.localOffset_R = 0
+                    pillar_R.localOffset_L = 0
+                    
+                    let pillar_LL = pillar_L.leftNode!
+                    
+                    pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.leftNode
+                    
+                    pillar_L.localOffset_L = pillar_L.localOffset_L - 1
+                    pillar_LL.localOffset_R = pillar_L.localOffset_L
+                    
+                    pillar_L = pillar_LL
+                    
+                } else if pillar_R.localOffset_R > 0 {
+                    
+                    pillar_L.localOffset_R = 0
+                    pillar_R.localOffset_L = 0
+                    
+                    let pillar_RR = pillar_R.rightNode!
+                    
+                    pillar_R.localOffset_R = pillar_R.localOffset_R - 1
+                    pillar_RR.localOffset_L = pillar_R.localOffset_R
+                      
+                } else if pillar_L.leftNode.lowerLevelNode == nil {
+                    
+                    if layers[currentLayer + 1].startOffset > 0 {
+                        
+                        layers[currentLayer + 1].startOffset = layers[currentLayer + 1].startOffset - 1
+                            
+                        pillar_L.localOffset_R = 0
+                        pillar_R.localOffset_L = 0
+                        pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.leftNode
+                        
+                    } else {
+                        
+                        let msg = layers[currentLayer + 1].removeFirst()
+                        try! kernelRemove(message: msg)
+                        
+                    }
+                    
+                    removeSectionOffset = false
+                    
+                } else if pillar_R.rightNode.lowerLevelNode == nil {
+                    
+                    if layers[currentLayer + 1].endOffset > 0 {
+                        
+                        layers[currentLayer + 1].startOffset = layers[currentLayer + 1].startOffset - 1
+                            
+                        pillar_L.localOffset_R = 0
+                        pillar_R.localOffset_L = 0
+                        pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.leftNode
+                        
+                    } else {
+                        
+                        let msg = layers[currentLayer + 1].removeLast()
+                        try! kernelRemove(message: msg)
+                       
+                    }
+                    
+                    removeSectionOffset = false
+                    
+                } else {
+                    
+                    repeatCycle = true
+                    let pillar_R_NEW = pillar_R.rightNode!
+                    currentMessage = layers[currentLayer + 1].removeNode(remove: pillar_R)
+                    
+                    pillar_L.sectionOffset_R = getSectionOffset(pillar: pillar_L)
+                    pillar_R_NEW.sectionOffset_L = pillar_L.sectionOffset_R
+                    
+                    pillar_L.localOffset_R = layers[currentLayer + 1].divider - 2
+                    pillar_R_NEW.localOffset_L = pillar_L.localOffset_R
+                    pillar_R = pillar_R_NEW
+                    
+                    currentLayer = currentLayer + 1
+                    
+                }
+   
+            }
+        }
+        
+        //Resetting Variables
+        //------------------------------------------
+        currentLayer = 0
+        pillar_L = message.nodes[1].upperLevelNode! //Hoping that pointers magic works
+        pillar_R = pillar_L.leftNode
+        //------------------------------------------
+        
+        //Decreasing sectionOffsets
+        //-------------------------------------------------------------------------------------
+        while currentLayer < layers.count && removeSectionOffset {
+            let tmp = layers[currentLayer + 1].notifyDeletion(left: pillar_L, right: pillar_R)
+            
+            if tmp[0] != nil && tmp[1] != nil {
+                
+                pillar_L = tmp[0]!
+                pillar_R = tmp[1]!
+                
+            } else {
+                currentLayer = layers.count
+            }
+        }
+        //-------------------------------------------------------------------------------------
+        
+        
+        
+    }
+    //--------------------------------------------------------------------------------------
+    
+    //MARK: Private "Helper" Functions
+    //--------------------------------------------------------------------------------------
+    private func getSectionOffset(pillar: Node4D<Element>) -> Int {
+        
+        var node = pillar.lowerLevelNode!
+        var result : Int = 0
+        
+        repeat {
+            result = result + node.sectionOffset_L
+            node = node.rightNode
+        } while node.upperLevelNode != nil
+        
+        return result
+        
+    }
+    //--------------------------------------------------------------------------------------
+    
+    
+}
