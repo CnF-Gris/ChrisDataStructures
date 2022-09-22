@@ -238,7 +238,7 @@ internal class SelfExposingList<Element> {
         }
         
         //Checks if we arrived to the treshold and exposes the node
-        if (startOffset % divider) == 0 {
+        if (startOffset % divider) == 0 && count > divider + 3 {
             
             startOffset = 0
             return responseMessage(nodes: [node], operationType: .addFirst, result: .delegating)
@@ -259,7 +259,7 @@ internal class SelfExposingList<Element> {
         }
         
         //Checks if we arrived to the treshold and exposes the node
-        if (endOffset % divider) == 0 {
+        if (endOffset % divider) == 0 && count > divider + 3{
             
             endOffset = 0
             return responseMessage(nodes: [node], operationType: .addLast, result: .delegating)
@@ -278,7 +278,7 @@ internal class SelfExposingList<Element> {
             
         }
         
-        if (startOffset + endOffset) == (divider) {
+        if (startOffset + endOffset) == (divider + 1) {
             
             
             startOffset = 0

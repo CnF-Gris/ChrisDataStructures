@@ -120,10 +120,25 @@ extension ListArray : RandomAccessCollection, Collection {
         while currentLayer < layers.count - 1 {
             
             var node = layers[currentLayer].getFirst()!
+            let layerConstantOffset : Int
+            
+            if currentLayer > 0 {
+                
+                var tmp = 100
+                if currentLayer >= 2 {
+                    for i in 2...currentLayer {
+                        tmp = tmp * layers[i].divider
+                    }
+                }
+                layerConstantOffset = tmp
+                
+            } else {
+                layerConstantOffset = 1
+            }
             
             while node.upperLevelNode == nil {
                 
-                OFFSET = OFFSET + node.sectionOffset_R
+                OFFSET = OFFSET + node.sectionOffset_R + layerConstantOffset
                 node = node.rightNode
                 
             }
