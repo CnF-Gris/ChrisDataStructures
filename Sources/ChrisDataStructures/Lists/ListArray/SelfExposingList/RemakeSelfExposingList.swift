@@ -24,8 +24,8 @@ internal class SelfExposingList<Element> {
     public var count: Int //Modified only by kernelAdd and kernelRemove
     public var isEmpty: Bool {return count == 0}
     
-    private var startOffset: Int
-    private var endOffset: Int
+    internal var startOffset: Int
+    internal var endOffset: Int
     internal let divider: Int
     
     init(divider: Int) {
@@ -360,6 +360,15 @@ internal class SelfExposingList<Element> {
     internal func notifyInsertion(left: Node4D<Element> , right: Node4D<Element>) -> [Node4D<Element>?] {
         
         left.sectionOffset_R =  left.sectionOffset_R + 1
+        right.sectionOffset_L =  left.sectionOffset_R
+        
+        return sectionLocker(node: left)
+        
+    }
+    
+    internal func notifyDeletion(left: Node4D<Element> , right: Node4D<Element>) -> [Node4D<Element>?] {
+        
+        left.sectionOffset_R =  left.sectionOffset_R - 1
         right.sectionOffset_L =  left.sectionOffset_R
         
         return sectionLocker(node: left)
