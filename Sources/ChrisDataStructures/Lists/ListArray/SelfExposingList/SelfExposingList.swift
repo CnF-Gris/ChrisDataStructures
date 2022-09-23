@@ -46,6 +46,19 @@ internal class SelfExposingList<Element> {
         
     }
     
+    deinit {
+        
+        #if DEBUG
+        print("Deallocating")
+        #endif
+        
+        header.leftNode = nil
+        header.rightNode = nil
+        
+        trailer.leftNode = nil
+        trailer.rightNode = nil
+    }
+    
     //MARK: Public functions
     //--------------------------------------------------------------------------------------
     public func getFirst() -> Node4D<Element>? {

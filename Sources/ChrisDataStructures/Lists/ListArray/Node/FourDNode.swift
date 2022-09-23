@@ -22,7 +22,7 @@ internal class Node4D<Element> {
     ///Node to the left node
     public var leftNode: Node4D<Element>!
     ///Node to the left node
-    public var rightNode: Node4D<Element>!
+    public weak var rightNode: Node4D<Element>!
     
     public var sectionOffset_L : Int
     public var sectionOffset_R : Int

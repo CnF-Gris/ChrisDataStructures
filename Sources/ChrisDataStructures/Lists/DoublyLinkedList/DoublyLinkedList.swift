@@ -36,6 +36,20 @@ public class DoublyLinkedList<Element> {
         lastItemTaken = (node: header, index: -1)
     }
     
+    deinit {
+        
+        #if DEBUG
+        print("Deallocating")
+        #endif
+        
+        header.leftNode = nil
+        header.rightNode = nil
+        
+        trailer.leftNode = nil
+        trailer.rightNode = nil
+        
+    }
+    
     //Public functions
     //----------------------------------------------------------------------------
     

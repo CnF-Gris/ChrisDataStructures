@@ -11,7 +11,7 @@ public class DoublyLinkedNode<Element> {
     ///A pointer to the previous Node
     public var leftNode : DoublyLinkedNode?
     ///A pointer to the next Node
-    public var rightNode : DoublyLinkedNode?
+    public weak var rightNode : DoublyLinkedNode?
     
     /**
      The Structure to validate the Node in the collection.

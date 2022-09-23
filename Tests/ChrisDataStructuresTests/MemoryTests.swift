@@ -16,12 +16,16 @@ final class MemoryTests: XCTestCase {
         //Here we need to test more for memory allocation
         //There is a small memory Leakeage
         memoryAllocation()
+        
+        for _ in 0...3 {
+            memoryAllocation()
+        }
     }
     
     private func memoryAllocation() {
         let list = ListArray<Int>()
         
-        for i in 0..<10000 {
+        for i in 0..<1000000 {
             
             let a = Int.random(in: 0...1)
             
@@ -32,17 +36,19 @@ final class MemoryTests: XCTestCase {
             }
         }
         
-        for _ in 0..<10000 {
-            let a = Int.random(in: 0...1)
-            
-            if a == 0 {
-                let _ =  list.removeLast()
-            } else {
-                let _ = list.removeFirst()
-            }
-        }
+        XCTAssert(list.count == 1000000)
         
-        XCTAssert(list.count == 0)
+//        for _ in 0..<10000 {
+//            let a = Int.random(in: 0...1)
+//
+//            if a == 0 {
+//                let _ =  list.removeLast()
+//            } else {
+//                let _ = list.removeFirst()
+//            }
+//        }
+        
+//        XCTAssert(list.count == 0)
     }
     
 }
