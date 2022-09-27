@@ -248,7 +248,8 @@ public class ListArray<Element> {
             pillar_L.localOffset_R = pillar_L.localOffset_R + 1
             pillar_R.localOffset_L = pillar_L.localOffset_R
             
-            if (pillar_L.localOffset_R % (layers[currentLayer + 1].divider - 1)) == 0 && pillar_L.localOffset_R != 0 {
+            //MARK: Here there could be a bug, but I don't really know, but if there's any issue, this may likely be the problem
+            if (pillar_L.localOffset_R % (layers[currentLayer].divider - 1)) == 0 && pillar_L.localOffset_R != 0 {
                 
                 //divider - 1
                 
