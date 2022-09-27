@@ -223,8 +223,8 @@ public class ListArray<Element> {
             
             if tmp[0] != nil && tmp[1] != nil {
                 
-                pillar_L = tmp[0]!
-                pillar_R = tmp[1]!
+                pillar_L = tmp[0]!.upperLevelNode!
+                pillar_R = tmp[1]!.upperLevelNode!
                 
             } else {
                 currentLayer = layers.count
@@ -248,7 +248,7 @@ public class ListArray<Element> {
             pillar_L.localOffset_R = pillar_L.localOffset_R + 1
             pillar_R.localOffset_L = pillar_L.localOffset_R
             
-            if (pillar_L.localOffset_R % layers[currentLayer + 1].divider - 1) == 0 {
+            if (pillar_L.localOffset_R % (layers[currentLayer + 1].divider - 1)) == 0 && pillar_L.localOffset_R != 0 {
                 
                 //divider - 1
                 

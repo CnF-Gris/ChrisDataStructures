@@ -38,10 +38,6 @@ public class DoublyLinkedList<Element> {
     
     deinit {
         
-        #if DEBUG
-        print("Deallocating")
-        #endif
-        
         header.leftNode = nil
         header.rightNode = nil
         

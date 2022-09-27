@@ -48,10 +48,6 @@ internal class SelfExposingList<Element> {
     
     deinit {
         
-        #if DEBUG
-        print("Deallocating")
-        #endif
-        
         header.leftNode = nil
         header.rightNode = nil
         
@@ -404,8 +400,8 @@ internal class SelfExposingList<Element> {
         let L_FOUND = node_L.upperLevelNode != nil //A
         let R_FOUND = node_R.upperLevelNode != nil //B
         
-        let L_IS_HEADER = node_L === self.header //C
-        let R_IS_TRAILER = node_R === self.trailer //D
+        let L_IS_HEADER = node_L.leftNode === node_L //C
+        let R_IS_TRAILER = node_R.rightNode === node_R //D
         
         //TRUTH TABLE
         /*
