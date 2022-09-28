@@ -77,15 +77,15 @@ internal class SelfExposingList<Element> {
     public func addFirst(node: Node4D<Element>) -> responseMessage<Element> {
         
         //Esposes a node if empty
-        let _ = kernelAdd(leftNode: self.header, node: node, rightNode: self.header.rightNode)
+        let _ = try! kernelAdd(leftNode: self.header, node: node, rightNode: self.header.rightNode)
         
         return kernelAddFirst(node: node)
-       
+        
     }
     
     public func addLast(node: Node4D<Element>) -> responseMessage<Element> {
-
-        let _ = kernelAdd(leftNode: self.trailer.leftNode, node: node, rightNode: self.trailer)
+        
+        let _ = try! kernelAdd(leftNode: self.trailer.leftNode, node: node, rightNode: self.trailer)
         
         return kernelAddLast(node: node)
         
@@ -109,10 +109,10 @@ internal class SelfExposingList<Element> {
             return responseMessage(nodes: nil, operationType: .removeFirst, result: .success)
         }
         
-        let response = kernelRemove(node: self.header.rightNode)
+        let response = try! kernelRemove(node: self.header.rightNode)
         
         return kernelRemoveFirst(node: response.nodes[0])
-    
+        
     }
     
     public func removeLast() -> responseMessage<Element> {
@@ -121,7 +121,7 @@ internal class SelfExposingList<Element> {
             return responseMessage(nodes: nil, operationType: .removeLast, result: .success)
         }
         
-        let response = kernelRemove(node: self.trailer.leftNode)
+        let response = try! kernelRemove(node: self.trailer.leftNode)
         
         return kernelRemoveLast(node: response.nodes[0])
         
@@ -129,8 +129,8 @@ internal class SelfExposingList<Element> {
     
     public func removeNode(remove node: Node4D<Element>)  -> responseMessage<Element> {
         
-        let nodes = sectionLocker(node: node)
-        let _ = kernelRemove(node: node)
+        let nodes = try! sectionLocker(node: node)
+        let _ = try! kernelRemove(node: node)
         
         if nodes[0] == nil && nodes[1] == nil {
             
@@ -156,8 +156,8 @@ internal class SelfExposingList<Element> {
     @inline(__always)
     private func addAfter(add node: Node4D<Element>, target: Node4D<Element>) -> responseMessage<Element> {
         
-        let _ = kernelAdd(leftNode: target, node: node, rightNode: target.rightNode)
-        let nodes = sectionLocker(node: node)
+        let _ = try! kernelAdd(leftNode: target, node: node, rightNode: target.rightNode)
+        let nodes = try! sectionLocker(node: node)
         
         if nodes[0] == nil && nodes[1] == nil {
             
@@ -179,8 +179,8 @@ internal class SelfExposingList<Element> {
     @inline(__always)
     private func addBefore(add node: Node4D<Element>, target: Node4D<Element>) -> responseMessage<Element> {
         
-        let _ = kernelAdd(leftNode: target.leftNode, node: node, rightNode: target)
-        let nodes = sectionLocker(node: node)
+        let _ = try! kernelAdd(leftNode: target.leftNode, node: node, rightNode: target)
+        let nodes = try! sectionLocker(node: node)
         
         if nodes[0] == nil && nodes[1] == nil {
             
@@ -203,26 +203,32 @@ internal class SelfExposingList<Element> {
     
     //MARK: Private "Kernel" functions
     //--------------------------------------------------------------------------------------
-    private func kernelAdd(leftNode: Node4D<Element>, node: Node4D<Element>, rightNode: Node4D<Element>) -> responseMessage<Element> {
-    
-    //only after every operation increment the counter
-    
-    leftNode.rightNode = node
-    rightNode.leftNode = node
-    
-    node.leftNode = leftNode
-    node.rightNode = rightNode
-    
-    count = count + 1
-    
-    //This is just not to lose any info
-    return responseMessage(nodes: [node, leftNode, rightNode], operationType: .addBetween, result: .delegating)
-    
-}
-    
-    private func kernelRemove(node: Node4D<Element>) -> responseMessage<Element> {
+    private func kernelAdd(leftNode: Node4D<Element>, node: Node4D<Element>, rightNode: Node4D<Element>) throws -> responseMessage<Element> {
         
-        //Theorically, I should be able to force unwrap
+        //MARK: Helper section to identify a bug of adding an element that points to itself and backtrace
+        
+        if leftNode === node || rightNode === node || leftNode === rightNode {
+            throw ListArrayExceptions.IllegalActionException
+        }
+        
+        //only after every operation increment the counter
+        
+        leftNode.rightNode = node
+        rightNode.leftNode = node
+        
+        node.leftNode = leftNode
+        node.rightNode = rightNode
+        
+        count = count + 1
+        
+        //This is just not to lose any info
+        return responseMessage(nodes: [node, leftNode, rightNode], operationType: .addBetween, result: .delegating)
+        
+    }
+    
+    private func kernelRemove(node: Node4D<Element>) throws -> responseMessage<Element> {
+        
+        //Theoretically, I should be able to force unwrap
         let node_L = node.leftNode!
         let node_R = node.rightNode!
         
@@ -230,6 +236,16 @@ internal class SelfExposingList<Element> {
         node_R.leftNode = node_L
         
         count = count - 1
+        
+        //MARK: Helper section to identify a bug of adding an element that points to itself and backtrace
+        
+        if node_L === node || node_R === node || node_L === node_R {
+            throw ListArrayExceptions.IllegalActionException
+        }
+        
+        if node.leftNode === node || node.rightNode === node {
+            throw ListArrayExceptions.IllegalActionException
+        }
         
         //This is just not to lose any info
         return responseMessage(nodes: [node, node_L, node_R], operationType: .removeBetween, result: .delegating)
@@ -267,7 +283,7 @@ internal class SelfExposingList<Element> {
             return response
         }
         
-        //Checks if we arrived to the treshold and exposes the node
+        //Checks if we arrived to the threshold and exposes the node
         if (endOffset % divider) == 0 && count > divider + 3{
             
             endOffset = 0
@@ -332,13 +348,13 @@ internal class SelfExposingList<Element> {
     //--------------------------------------------------------------------------------------
     
     //TODO: Verify that there are no errors due to not checking for pillar
-    internal func sectionLocker(node: Node4D<Element>) -> [Node4D<Element>?] {
+    internal func sectionLocker(node: Node4D<Element>) throws -> [Node4D<Element>?] {
         
         if count < divider + 3 {
             return [nil, nil]
         }
         
-        var node_L = node.leftNode!
+        var node_L = node
         var node_R = node.rightNode!
         
         var Booleans = try! sectionLockerHelper(node_L: node_L, node_R: node_R)
@@ -347,14 +363,16 @@ internal class SelfExposingList<Element> {
             
             if !Booleans[1] {
                 node_L = node_L.leftNode
+                
             }
             
             if !Booleans[2] {
                 node_R = node_R.rightNode
+    
             }
             
             Booleans = try! sectionLockerHelper(node_L: node_L, node_R: node_R)
-
+            
         }
         
         if Booleans[3] {
@@ -362,7 +380,7 @@ internal class SelfExposingList<Element> {
         } else if Booleans[4] {
             return [node_L, nil]
         }
-            
+        
         return [node_L, node_R]
     }
     
@@ -371,7 +389,7 @@ internal class SelfExposingList<Element> {
         left.sectionOffset_R =  left.sectionOffset_R + 1
         right.sectionOffset_L =  left.sectionOffset_R
         
-        return sectionLocker(node: left)
+        return try! sectionLocker(node: left)
         
     }
     
@@ -380,7 +398,7 @@ internal class SelfExposingList<Element> {
         left.sectionOffset_R =  left.sectionOffset_R - 1
         right.sectionOffset_L =  left.sectionOffset_R
         
-        return sectionLocker(node: left)
+        return try! sectionLocker(node: left)
         
     }
     //--------------------------------------------------------------------------------------
@@ -400,8 +418,8 @@ internal class SelfExposingList<Element> {
         let L_FOUND = node_L.upperLevelNode != nil //A
         let R_FOUND = node_R.upperLevelNode != nil //B
         
-        let L_IS_HEADER = node_L.leftNode === node_L //C
-        let R_IS_TRAILER = node_R.rightNode === node_R //D
+        let L_IS_HEADER = (node_L === self.header ) || (node_L === node_L.leftNode)//C
+        let R_IS_TRAILER = (node_R === self.trailer) || (node_R === node_R.rightNode) //D
         
         //TRUTH TABLE
         /*

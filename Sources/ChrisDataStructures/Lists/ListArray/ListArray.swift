@@ -67,6 +67,7 @@ public class ListArray<Element> {
     
     public func addBefore(position: Int, item: Element) {
         
+        //FIXME: There's a problem with the search
         let target = try! efficentSeach(position: position) //To be implemented
         let node2Add = Node4D(element: item)
         
@@ -75,6 +76,10 @@ public class ListArray<Element> {
         if message.result == .delegating {
             
             try! kernelAdd(message: message)
+            
+        } else if message.result == .success {
+            
+            return
             
         } else {
             
@@ -94,6 +99,10 @@ public class ListArray<Element> {
         if message.result == .delegating {
             
             try! kernelAdd(message: message)
+            
+        } else if message.result == .success {
+            
+            return
             
         } else {
             
@@ -242,7 +251,7 @@ public class ListArray<Element> {
         while repeatCycle && currentLayer < layers.count - 1 {
             
             pillar_L = currentMessage.nodes[1].upperLevelNode!
-            pillar_R =  currentMessage.nodes[2].upperLevelNode!
+            pillar_R = currentMessage.nodes[2].upperLevelNode!
             
             
             pillar_L.localOffset_R = pillar_L.localOffset_R + 1
