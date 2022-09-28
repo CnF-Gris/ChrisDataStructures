@@ -50,7 +50,7 @@ public class ListArray<Element> {
         let response = base.addFirst(node: node2Add)
         
         if response.result == .delegating {
-            try! kernelAdd(message: response)
+            try! kernelAdd(message: response,startLayer: nil)
         }
         
     }
@@ -61,7 +61,7 @@ public class ListArray<Element> {
         let response = layers.getFirst()!.addLast(node: node2Add)
         
         if response.result == .delegating {
-            try! kernelAdd(message: response)
+            try! kernelAdd(message: response,startLayer: nil)
         }
     }
     
@@ -75,7 +75,7 @@ public class ListArray<Element> {
         
         if message.result == .delegating {
             
-            try! kernelAdd(message: message)
+            try! kernelAdd(message: message, startLayer: nil)
             
         } else if message.result == .success {
             
@@ -98,7 +98,7 @@ public class ListArray<Element> {
         
         if message.result == .delegating {
             
-            try! kernelAdd(message: message)
+            try! kernelAdd(message: message, startLayer: nil)
             
         } else if message.result == .success {
             
@@ -163,10 +163,14 @@ public class ListArray<Element> {
     //--------------------------------------------------------------------------------------
     
     //This method is ok for AddFirst an AddLast and some cases of AddBetween, but the latter needs another method
-    private func kernelAdd(message: responseMessage<Element>) throws {
+    private func kernelAdd(message: responseMessage<Element>, startLayer : Int?) throws {
         
         var currentMessage = message
-        var currentLayer = 0 //Like indeces
+        var currentLayer = 0  //Like indices
+        if startLayer != nil {
+            currentLayer = startLayer!
+        }
+       
         
        
         
@@ -220,7 +224,7 @@ public class ListArray<Element> {
     private func kernelExpansion(message: responseMessage<Element>) {
         
         var currentMessage = message
-        var currentLayer = 0 //Like indeces
+        var currentLayer = 0 //Like indices
         
         var pillar_L = message.nodes[1].upperLevelNode!
         var pillar_R = message.nodes[2].upperLevelNode!
@@ -292,7 +296,7 @@ public class ListArray<Element> {
                 
                 if currentMessage.count < 3 {
                     repeatCycle = false
-                    try! kernelAdd(message: currentMessage)
+                    try! kernelAdd(message: currentMessage, startLayer: currentLayer + 1)
                 }
                 
                 currentLayer = currentLayer + 1

@@ -368,7 +368,7 @@ internal class SelfExposingList<Element> {
             
             if !Booleans[2] {
                 node_R = node_R.rightNode
-    
+                
             }
             
             Booleans = try! sectionLockerHelper(node_L: node_L, node_R: node_R)
