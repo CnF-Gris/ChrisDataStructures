@@ -232,6 +232,8 @@ public class ListArray<Element> {
         //Increasing sectionOffsets
         //-------------------------------------------------------------------------------------
         while currentLayer < layers.count {
+            
+            //FIXME: Am I passing things to the right layer?
             let tmp = layers[currentLayer + 1].notifyInsertion(left: pillar_L, right: pillar_R)
             
             if tmp[0] != nil && tmp[1] != nil {
@@ -239,6 +241,7 @@ public class ListArray<Element> {
                 pillar_L = tmp[0]!.upperLevelNode!
                 pillar_R = tmp[1]!.upperLevelNode!
                 
+                currentLayer = currentLayer + 1
             } else {
                 currentLayer = layers.count
             }

@@ -384,6 +384,7 @@ internal class SelfExposingList<Element> {
         return [node_L, node_R]
     }
     
+    //MARK: Possible Culprit?
     internal func notifyInsertion(left: Node4D<Element> , right: Node4D<Element>) -> [Node4D<Element>?] {
         
         left.sectionOffset_R =  left.sectionOffset_R + 1
