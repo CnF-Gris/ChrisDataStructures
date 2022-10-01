@@ -419,8 +419,8 @@ internal class SelfExposingList<Element> {
         let L_FOUND = node_L.upperLevelNode != nil //A
         let R_FOUND = node_R.upperLevelNode != nil //B
         
-        let L_IS_HEADER = (node_L === self.header ) || (node_L === node_L.leftNode)//C
-        let R_IS_TRAILER = (node_R === self.trailer) || (node_R === node_R.rightNode) //D
+        let L_IS_HEADER = (node_L === header ) || (node_L === node_L.leftNode)//C
+        let R_IS_TRAILER = (node_R === trailer) || (node_R === node_R.rightNode) //D
         
         //TRUTH TABLE
         /*

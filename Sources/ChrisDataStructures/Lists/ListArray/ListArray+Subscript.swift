@@ -27,20 +27,20 @@ extension ListArray : RandomAccessCollection, Collection {
 
         get {
             
-            return try! efficentSeach(position: position).element
+            return try! efficientSearch(position: position).element
 
         }
 
         set(newValue) {
 
-            let tmp = try! efficentSeach(position: position)
+            let tmp = try! efficientSearch(position: position)
             tmp.element = newValue
             
         }
 
     }
 
-    internal func efficentSeach(position: Int) throws -> Node4D<Element> {
+    internal func efficientSearch(position: Int) throws -> Node4D<Element> {
         
         if position < startIndex || position > endIndex {
             throw ListArrayExceptions.IndexOutOfBoundException  

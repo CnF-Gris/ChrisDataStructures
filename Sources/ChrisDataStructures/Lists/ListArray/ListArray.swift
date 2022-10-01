@@ -68,7 +68,7 @@ public class ListArray<Element> {
     public func addBefore(position: Int, item: Element) {
         
         //FIXME: There's a problem with the search
-        let target = try! efficentSeach(position: position) //To be implemented
+        let target = try! efficientSearch(position: position) //To be implemented
         let node2Add = Node4D(element: item)
         
         let message = try! base.addBetween(add: node2Add, how: .before, target: target)
@@ -91,7 +91,7 @@ public class ListArray<Element> {
     
     public func addAfter(position: Int, item: Element) {
         
-        let target = try! efficentSeach(position: position) //To be implemented
+        let target = try! efficientSearch(position: position) //To be implemented
         let node2Add = Node4D(element: item)
         
         let message = try! base.addBetween(add: node2Add, how: .after, target: target)
@@ -146,7 +146,7 @@ public class ListArray<Element> {
             return nil
         }
         
-        let response = base.removeNode(remove: try! efficentSeach(position: position))
+        let response = base.removeNode(remove: try! efficientSearch(position: position))
         
         if response.result == .delegating {
             try! kernelRemove(message: response)

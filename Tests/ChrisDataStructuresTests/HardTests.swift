@@ -12,8 +12,8 @@ final class HardTests: XCTestCase {
     
     func testRandomAdd() throws {
         
-        let a1 = 10000
-        let a2 = 100000
+        let a1 = 1000000
+        let a2 = 1000000
         
         let list = ListArray<Int>()
         
