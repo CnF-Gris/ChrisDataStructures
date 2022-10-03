@@ -12,7 +12,6 @@ public class DoublyLinkedList<Element> {
     private let header : DoublyLinkedNode<Element>
     private let trailer : DoublyLinkedNode<Element>
     
-    //FIXME: There's a problem with counts
     public var count : Int
     public var isEmpty : Bool { return count == 0 }
     
@@ -27,14 +26,24 @@ public class DoublyLinkedList<Element> {
         trailer = DoublyLinkedNode()
         
         //Header Setup
-        header.next = trailer
-        header.previous = header // This allows to never go out of bounds
+        header.rightNode = trailer
+        header.leftNode = header // This allows to never go out of bounds
         
         //Trailer Setup
-        trailer.previous = header
-        trailer.next = trailer
+        trailer.leftNode = header
+        trailer.rightNode = trailer
         
         lastItemTaken = (node: header, index: -1)
+    }
+    
+    deinit {
+        
+        header.leftNode = nil
+        header.rightNode = nil
+        
+        trailer.leftNode = nil
+        trailer.rightNode = nil
+        
     }
     
     //Public functions
@@ -42,33 +51,33 @@ public class DoublyLinkedList<Element> {
     
     public func addFirst(_ element: Element) {
         
-        addNode(previous: header, node: DoublyLinkedNode(structure: self, element: element), next: header.next!)
+        addNode(previous: header, node: DoublyLinkedNode(structure: self, element: element), next: header.rightNode!)
         
     }
     
     public func addFirst(_ node: DoublyLinkedNode<Element>) {
         
         node.structure = self
-        addNode(previous: header, node: node, next: header.next!)
+        addNode(previous: header, node: node, next: header.rightNode!)
         
     }
     
     public func addLast(_ element: Element) {
         
-        addNode(previous: trailer.previous!, node: DoublyLinkedNode(structure: self, element: element), next: trailer)
+        addNode(previous: trailer.leftNode!, node: DoublyLinkedNode(structure: self, element: element), next: trailer)
         
     }
     
     public func addLast(_ node: DoublyLinkedNode<Element>) {
         
         node.structure = self
-        addNode(previous: trailer.previous!, node: node, next: trailer)
+        addNode(previous: trailer.leftNode!, node: node, next: trailer)
     }
     
     public func removeFirst() -> Element? {
         
         if !isEmpty {
-            return removeNode(node: header.next!)
+            return removeNode(node: header.rightNode!)
         }
         
         return nil
@@ -78,7 +87,7 @@ public class DoublyLinkedList<Element> {
     public func removeLast() -> Element? {
         
         if !isEmpty {
-            return removeNode(node: trailer.previous!)
+            return removeNode(node: trailer.leftNode!)
         }
         
         return nil
@@ -86,19 +95,19 @@ public class DoublyLinkedList<Element> {
     }
     
     public func getFirst() -> Element? {
-        return header.next?.element
+        return header.rightNode?.element
     }
     
     public func getFirstNode() -> DoublyLinkedNode<Element>? {
-        return header.next
+        return header.rightNode
     }
     
     public func getLast() -> Element? {
-        return trailer.previous?.element
+        return trailer.leftNode?.element
     }
     
     public func getLastNode() -> DoublyLinkedNode<Element>? {
-        return trailer.previous
+        return trailer.leftNode
     }
     
     //----------------------------------------------------------------------------
@@ -118,13 +127,13 @@ public class DoublyLinkedList<Element> {
         
         if minDistance == startDistance {
             
-            tmpNode = header.next!
+            tmpNode = header.rightNode!
             advanceBy(startIndex: 0, endIndex: position, startNode: &tmpNode)
             
             
         } else if minDistance == endDistance {
             
-            tmpNode = trailer.previous!
+            tmpNode = trailer.leftNode!
             if position > endIndex {
                 print(self.count)
                 print(endIndex)
@@ -153,13 +162,13 @@ public class DoublyLinkedList<Element> {
     
     private func advanceBy(startIndex: Int, endIndex: Int, startNode: inout DoublyLinkedNode<Element>) {
         for _ in startIndex..<endIndex {
-            startNode = startNode.next!
+            startNode = startNode.rightNode!
         }
     }
     
     private func reverseBy(startIndex: Int, endIndex: Int, startNode: inout DoublyLinkedNode<Element>) {
         for _ in startIndex..<endIndex {
-            startNode = startNode.previous!
+            startNode = startNode.leftNode!
         }
     }
     
@@ -174,11 +183,11 @@ public class DoublyLinkedList<Element> {
         
         node.structure = self
         
-        previous.next = node
-        next.previous = node
+        previous.rightNode = node
+        next.leftNode = node
         
-        node.previous = previous
-        node.next = next
+        node.leftNode = previous
+        node.rightNode = next
         
         count = count + 1
         
@@ -186,19 +195,19 @@ public class DoublyLinkedList<Element> {
     
     private func removeNode(node: DoublyLinkedNode<Element>) -> Element {
         
-        let nextNode = node.next!
-        let previousNode = node.previous!
+        let nextNode = node.rightNode!
+        let previousNode = node.leftNode!
         
         if node === lastItemTaken.node {
-            lastItemTaken.node = node.next!
+            lastItemTaken.node = node.rightNode!
         }
         
-        nextNode.previous = previousNode
-        previousNode.next = nextNode
+        nextNode.leftNode = previousNode
+        previousNode.rightNode = nextNode
         
         //Helping the ARC
-        node.previous = nil
-        node.next = nil
+        node.leftNode = nil
+        node.rightNode = nil
         
         count = count - 1
         

@@ -9,9 +9,9 @@ import Foundation
 
 public class DoublyLinkedNode<Element> {
     ///A pointer to the previous Node
-    public var previous : DoublyLinkedNode?
+    public var leftNode : DoublyLinkedNode?
     ///A pointer to the next Node
-    public var next : DoublyLinkedNode?
+    public weak var rightNode : DoublyLinkedNode?
     
     /**
      The Structure to validate the Node in the collection.
