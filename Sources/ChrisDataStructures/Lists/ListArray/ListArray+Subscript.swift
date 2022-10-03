@@ -69,22 +69,25 @@ extension ListArray : RandomAccessCollection, Collection {
                 layerConstantOffset = 1
             }
             
-            if distance(from: currentPosition, to: position) > 0 {
+            var distance = distance(from: currentPosition, to: position)
+            
+            if distance > 0 {
                 
-                while (distance(from: currentPosition, to: position) - (currentNode.sectionOffset_R + layerConstantOffset)) >= 0 {
+                while (distance - (currentNode.sectionOffset_R + layerConstantOffset)) >= 0 {
                     
                     currentPosition = currentPosition + (currentNode.sectionOffset_R + layerConstantOffset)
                     currentNode = currentNode.rightNode
+                    distance = distance - (currentNode.sectionOffset_R + layerConstantOffset)
                     
                 }
                 
-            } else if distance(from: currentPosition, to: position) < 0 && currentLayer < layers.count - 1 {
+            } else if distance < 0 && currentLayer < layers.count - 1 {
                 
-                while (abs(distance(from: currentPosition, to: position)) - (currentNode.sectionOffset_L + layerConstantOffset)) >= 0 {
+                while (abs(distance) - (currentNode.sectionOffset_L + layerConstantOffset)) >= 0 {
                     
                     currentPosition = currentPosition - (currentNode.sectionOffset_L + layerConstantOffset)
                     currentNode = currentNode.leftNode
-                    
+                    distance = position - currentPosition
                 }
                 
             }

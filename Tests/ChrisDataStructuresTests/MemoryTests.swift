@@ -14,7 +14,7 @@ final class MemoryTests: XCTestCase {
     public func testMemoryDeallocation() {
         
         //Here we need to test more for memory allocation
-        //There is a small memory Leakeage
+        //There is a small memory Leakage
         memoryAllocation()
         
         for _ in 0...3 {

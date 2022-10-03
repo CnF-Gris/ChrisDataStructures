@@ -117,5 +117,59 @@ final class ComparisonTest: XCTestCase {
             print(arr[10])
         }
     }
+    
+    func testPerformanceSearchListArray() {
+        
+        let a = 1000000
+        
+        var list = ListArray<Int>()
+        
+        for i in 0..<a {
+            
+            list.addLast(i)
+            
+        }
+        
+        measure{
+            print(list[599999])
+        }
+        
+    }
+
+    func testPerformanceSearchArray() {
+        
+        let a = 1000000
+        
+        var arr = Array<Int>()
+        
+        for i in 0..<a {
+            
+            arr.append(i)
+            
+        }
+        
+        measure{
+            print(arr[599999])
+        }
+        
+    }
+    
+    func testPerformanceSearchPerformanceList() {
+        
+        let a = 1000000
+        
+        var pL = PerformanceList<Int>()
+        
+        for i in 0..<a {
+            
+            pL.addLast(element: i)
+        
+        }
+        
+        measure{
+            print(pL[599999])
+        }
+        
+    }
 
 }

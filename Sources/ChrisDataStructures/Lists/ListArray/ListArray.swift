@@ -120,7 +120,7 @@ public class ListArray<Element> {
         let response = base.removeFirst()
         
         if response.result == .delegating {
-            try! kernelRemove(message: response)
+            try! kernelRemove(message: response, currentLayer: 0)
         }
         
         return response.nodes[0].element
@@ -134,7 +134,7 @@ public class ListArray<Element> {
         let response = base.removeLast()
         
         if response.result == .delegating {
-            try! kernelRemove(message: response)
+            try! kernelRemove(message: response, currentLayer: 0)
         }
         
         return response.nodes[0].element
@@ -149,9 +149,9 @@ public class ListArray<Element> {
         let response = base.removeNode(remove: try! efficientSearch(position: position))
         
         if response.result == .delegating {
-            try! kernelRemove(message: response)
+            try! kernelRemove(message: response, currentLayer: 0)
         } else if response.result == .notifyContraction {
-            
+            kernelContrction(message: response)
         }
         
         return response.nodes[0].element
@@ -313,11 +313,11 @@ public class ListArray<Element> {
         
     }
     
-    private func kernelRemove(message: responseMessage<Element>) throws {
+    private func kernelRemove(message: responseMessage<Element>, currentLayer: Int) throws {
         
         //now we just said that we were removing a pillar
         var currentMessage = message
-        var currentLayer = 0
+        var currentLayer = currentLayer
         
         while currentMessage.result == .delegating && currentLayer < layers.count - 1{
             
@@ -325,13 +325,13 @@ public class ListArray<Element> {
             switch currentMessage.operationType {
             case .removeFirst:
                 
-                if layers[currentLayer + 1].getFirst()?.lowerLevelNode != nil {
+                if layers[currentLayer + 1].getFirst()?.lowerLevelNode === message.nodes[0] {
                     currentMessage = layers[currentLayer + 1].removeFirst()
                 }
                 
             case .removeLast:
                 
-                if layers[currentLayer + 1].getLast()?.lowerLevelNode != nil {
+                if layers[currentLayer + 1].getLast()?.lowerLevelNode === message.nodes[0]{
                     currentMessage = layers[currentLayer + 1].removeLast()
                 }
                 
@@ -371,9 +371,9 @@ public class ListArray<Element> {
         var pillar_L = message.nodes[1].upperLevelNode!
         var pillar_R = message.nodes[2].upperLevelNode!
         
+        //We are on level 0 considering level 1 nodes !!!
         
-        
-        //Decreasing sectionOffsets
+        //Decreasing localOffsets
         //-------------------------------------------------------------------------------------
         while repeatCycle && currentLayer < layers.count {
             
@@ -385,9 +385,11 @@ public class ListArray<Element> {
             pillar_L.localOffset_R = pillar_L.localOffset_R - 1
             pillar_R.localOffset_L = pillar_L.localOffset_R
             
+            //Now we have to decide whether to expand or delete
             if pillar_L.localOffset_R < 0 {
                 
-                //Best cases
+                //Best cases [Expansion]
+                //-----------------------------------------------------------------
                 if pillar_L.localOffset_L > 0 {
                     
                     pillar_L.localOffset_R = 0
@@ -412,44 +414,64 @@ public class ListArray<Element> {
                     pillar_R.localOffset_R = pillar_R.localOffset_R - 1
                     pillar_RR.localOffset_L = pillar_R.localOffset_R
                       
-                } else if pillar_L.leftNode.lowerLevelNode == nil {
+                //-----------------------------------------------------------------
                     
-                    if layers[currentLayer + 1].startOffset > 0 {
+                } else if pillar_L.leftNode.lowerLevelNode == nil { //We are on the header
+                    
+                    //Best case [Expansion]
+                    //-----------------------------------------------------------------
+                    if layers[currentLayer].startOffset > 0 {
                         
-                        layers[currentLayer + 1].startOffset = layers[currentLayer + 1].startOffset - 1
+                        layers[currentLayer].startOffset = layers[currentLayer].startOffset - 1
                             
                         pillar_L.localOffset_R = 0
                         pillar_R.localOffset_L = 0
                         pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.leftNode
                         
-                    } else {
+                    //-----------------------------------------------------------------
                         
+                    //Worst case [Delete]
+                    //-----------------------------------------------------------------
+                    } else {
+                        layers[currentLayer].startOffset = layers[currentLayer].divider - 1
                         let msg = layers[currentLayer + 1].removeFirst()
-                        try! kernelRemove(message: msg)
+                        try! kernelRemove(message: msg, currentLayer: currentLayer + 1)
                         
                     }
                     
                     removeSectionOffset = false
                     
-                } else if pillar_R.rightNode.lowerLevelNode == nil {
+                    //-----------------------------------------------------------------
                     
-                    if layers[currentLayer + 1].endOffset > 0 {
+                } else if pillar_R.rightNode.lowerLevelNode == nil { //We are on the trailer
+                    
+                    //Best case [Expansion]
+                    //-----------------------------------------------------------------
+                    if layers[currentLayer].endOffset > 0 {
                         
-                        layers[currentLayer + 1].startOffset = layers[currentLayer + 1].startOffset - 1
+                        layers[currentLayer].startOffset = layers[currentLayer].startOffset - 1
                             
                         pillar_L.localOffset_R = 0
                         pillar_R.localOffset_L = 0
                         pillar_L.lowerLevelNode = pillar_L.lowerLevelNode!.leftNode
                         
+                    //-----------------------------------------------------------------
+                        
+                    //Worst case [Delete]
+                    //-----------------------------------------------------------------
                     } else {
                         
+                        layers[currentLayer].endOffset = layers[currentLayer].divider - 1
                         let msg = layers[currentLayer + 1].removeLast()
-                        try! kernelRemove(message: msg)
+                        try! kernelRemove(message: msg, currentLayer: currentLayer)
                        
                     }
                     
                     removeSectionOffset = false
+                    //-----------------------------------------------------------------
                     
+                //Worst case [Delete]
+                //---------------------------------------------------------------------
                 } else {
                     
                     repeatCycle = true
@@ -466,15 +488,17 @@ public class ListArray<Element> {
                     currentLayer = currentLayer + 1
                     
                 }
-   
+                //---------------------------------------------------------------------
             }
         }
         
         //Resetting Variables
         //------------------------------------------
         currentLayer = 0
+        
+        //pillar_L was removed already, so it's better to take pillar_R as pillar_L
         pillar_L = message.nodes[1].upperLevelNode! //Hoping that pointers magic works
-        pillar_R = pillar_L.leftNode
+        pillar_R = message.nodes[2].upperLevelNode!
         //------------------------------------------
         
         //Decreasing sectionOffsets

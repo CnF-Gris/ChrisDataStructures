@@ -146,4 +146,38 @@ final class HardTests: XCTestCase {
         XCTAssert(list[5110] == 69)
     }
     
+    func testRemovalOfItem() {
+        
+        let list = ListArray<Int>()
+        
+        for i in 0..<10000 {
+            
+            
+            list.addLast(i)
+        }
+        
+        let n1 = list.removeAt(position: 0)
+        
+        print(list[0])
+        XCTAssert(list[0] == 1)
+    }
+    
+    func testRemovalOfItemHARD() {
+        
+        let list = ListArray<Int>()
+        
+        for i in 0..<10000 {
+            
+            
+            list.addLast(i)
+        }
+        
+        for _ in 0..<1000 {
+            let n1 = list.removeAt(position: 1)
+        }
+        
+        print(list[1])
+        XCTAssert(list[1] == 1001)
+    }
+    
 }
